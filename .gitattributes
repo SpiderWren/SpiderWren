@@ -1,1 +1,2 @@
-*.wren linguist-language=Javascript
+*.wren linguist-language=JavaScript
+*.wren linguist-vendored
