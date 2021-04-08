@@ -15,8 +15,7 @@ import (
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Starts a server to run your app",
-	Long: `Starts a development server on port 3333 by default. 
-This can be changed with --port=3000, for example`,
+	Long: `Starts a development server to run your app.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		debugMode, err := cmd.Flags().GetBool("debug")
 		if err != nil {
@@ -37,6 +36,7 @@ This can be changed with --port=3000, for example`,
 		defer vm.Free()
 		app := web.App{
 			Router: gin.Default(),
+			IsServing: false,
 		}
 		log.Debug("Creating foreign classes")
 		web.CreateForeignClasses(vm, &app)

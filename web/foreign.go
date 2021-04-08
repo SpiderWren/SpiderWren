@@ -16,6 +16,13 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 				if !ok {
 					log.Fatal("Must pass a string to the first argument of Routes.GET")
 				}
+				if app.HasRoute(str) {
+					log.Errorf("Route %s already registered, ignoring", str)
+
+					return nil, nil
+				} else {
+					app.Routes = append(app.Routes, str)
+				}
 				app.Router.GET(str, func(context *gin.Context) {
 					handle, ok := parameters[2].(*wren.Handle)
 					if !ok {
@@ -47,6 +54,11 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 		}),
 		"App": wren.NewClass(nil, nil, wren.MethodMap{
 			"static run(_)": func(vm *wren.VM, parameters []interface{}) (interface{}, error) {
+				if app.IsServing {
+					return nil, nil
+				} else {
+					app.IsServing = true
+				}
 				portFloat, ok := parameters[1].(float64)
 				if !ok {
 					log.Fatalf("Invalid port number")
