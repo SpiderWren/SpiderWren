@@ -36,17 +36,17 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 					result, err := callHandle.Call()
 					if err != nil {
 						context.Header("Content-Type", "text/html")
-						context.String(500,"An error occurred: {{.error}}", gin.H{
-							"error": err.Error(),
-						})
+						context.String(500,"An error occurred: %s", err.Error())
 						return
 					}
 					out, ok := result.(string)
+
 					if !ok {
 						log.Fatal("Must return a string")
 					}
+
 					context.Header("Content-Type","text/html")
-					context.String(200, out, nil)
+					context.String(200, out)
 
 				})
 				return nil, nil
@@ -64,8 +64,8 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 					log.Fatalf("Invalid port number")
 				}
 				port := int(portFloat)
-				err := app.Router.Run("localhost:"  + strconv.Itoa(port))
-				return nil, err
+				go app.Router.Run("localhost:"  + strconv.Itoa(port))
+				return nil, nil
 			},
 		}),
 	}))

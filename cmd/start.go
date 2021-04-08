@@ -3,6 +3,9 @@ package cmd
 import (
 	_ "embed"
 	"github.com/gin-gonic/gin"
+	"os"
+	"os/signal"
+	"syscall"
 
 	wren "github.com/crazyinfin8/WrenGo"
 	"github.com/nailuj29gaming/wren-web/utils"
@@ -44,6 +47,9 @@ var startCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalf("An error occurred while running %s: %s", args[0], err.Error())
 		}
+		sc := make(chan os.Signal, 1)
+		signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
+		<-sc
 	},
 }
 
