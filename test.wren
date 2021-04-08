@@ -8,4 +8,4 @@ Routes.GET("/twoplustwo") {
     return "%(2 + 2)"
 }
 
-App.run(6969)
+App.run(3000)
