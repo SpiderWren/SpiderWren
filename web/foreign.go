@@ -64,7 +64,7 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 					log.Fatalf("Invalid port number")
 				}
 				port := int(portFloat)
-				go app.Router.Run("localhost:"  + strconv.Itoa(port))
+				go app.Router.Run("0.0.0.0:"  + strconv.Itoa(port))
 				return nil, nil
 			},
 		}),
