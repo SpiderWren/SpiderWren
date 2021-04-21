@@ -29,16 +29,26 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 						log.Fatal("Must pass a handle to the second argument of Routes.GET")
 					}
 
-					callHandle, err := handle.Func("call()")
+					callHandle, err := handle.Func("call(_)")
 					if err != nil {
-						log.Fatal("Must pass a handle with 0 parameters to the second argument of Routes.GET")
+						log.Fatal("Must pass a handle with 0-1 parameters to the second argument of Routes.GET")
 					}
-					result, err := callHandle.Call()
+					params, err := vm.NewMap()
+					if err != nil {
+						log.Fatalf("An error occurred when creating a map: %s", err.Error())
+						return // IDE seems to want this
+					}
+					defer params.Free()
+					for _, param := range context.Params {
+						params.Set(param.Key, param.Value)
+					}
+					result, err := callHandle.Call(params)
 					if err != nil {
 						context.Header("Content-Type", "text/html")
 						context.String(500,"An error occurred: %s", err.Error())
 						return
 					}
+
 					out, ok := result.(string)
 
 					if !ok {
