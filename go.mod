@@ -1,4 +1,4 @@
-module github.com/nailuj29gaming/wren-web
+module github.com/wren-web/wren-web
 
 go 1.16
 
