@@ -8,8 +8,8 @@ import (
 	"syscall"
 
 	wren "github.com/crazyinfin8/WrenGo"
-	"github.com/nailuj29gaming/wren-web/utils"
-	"github.com/nailuj29gaming/wren-web/web"
+	"github.com/wren-web/wren-web/utils"
+	"github.com/wren-web/wren-web/web"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

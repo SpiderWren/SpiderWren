@@ -1,6 +1,6 @@
 package main
 
-import "github.com/nailuj29gaming/wren-web/cmd"
+import "github.com/wren-web/wren-web/cmd"
 
 func main() {
 	cmd.Execute()
