@@ -1,6 +1,6 @@
 package main
 
-import "github.com/nailuj29gaming/wren-web/cmd"
+import "github.com/spiderwren/spiderwren/cmd"
 
 func main() {
 	cmd.Execute()

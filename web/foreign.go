@@ -1,10 +1,13 @@
 package web
 
 import (
+	"errors"
+	"strconv"
+
 	wren "github.com/crazyinfin8/WrenGo"
+	"github.com/flosch/pongo2"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"strconv"
 )
 
 func CreateForeignClasses(vm *wren.VM, app *App) {
@@ -45,7 +48,7 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 					result, err := callHandle.Call(params)
 					if err != nil {
 						context.Header("Content-Type", "text/html")
-						context.String(500,"An error occurred: %s", err.Error())
+						context.String(500, "An error occurred: %s", err.Error())
 						return
 					}
 
@@ -55,7 +58,7 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 						log.Fatal("Must return a string")
 					}
 
-					context.Header("Content-Type","text/html")
+					context.Header("Content-Type", "text/html")
 					context.String(200, out)
 
 				})
@@ -74,10 +77,71 @@ func CreateForeignClasses(vm *wren.VM, app *App) {
 					log.Fatalf("Invalid port number")
 				}
 				port := int(portFloat)
-				go app.Router.Run("0.0.0.0:"  + strconv.Itoa(port))
+				go app.Router.Run("0.0.0.0:" + strconv.Itoa(port))
 				return nil, nil
+			},
+		}),
+		"TemplatesHelper": wren.NewClass(nil, nil, wren.MethodMap{
+			"static render(_,_,_)": func(vm *wren.VM, parameters []interface{}) (interface{}, error) {
+				engine := "jinja"
+				path, ok := parameters[1].(string)
+				if !ok {
+					return nil, errors.New("must pass a string to the first argument of Templates.render")
+				}
+				wMap, ok := parameters[2].(*wren.MapHandle)
+				if !ok {
+					return nil, errors.New("must pass a map to the first argument of Templates.render")
+				}
+				keys, ok := parameters[3].(*wren.ListHandle)
+				if !ok {
+					return nil, errors.New("must pass a list to the second argument of Templates.render")
+				}
+				goMap, err := wrenMapToGoMap(wMap, keys)
+				if err != nil {
+					return nil, err
+				}
+				if len(parameters) == 5 {
+					engine, ok = parameters[4].(string)
+					if !ok {
+						return nil, errors.New("must pass a string or null to the third argument of Templates.render")
+					}
+				}
+				switch engine {
+				case "jinja":
+					tpl, err := pongo2.FromFile(path)
+					if err != nil {
+						return nil, err
+					}
+					return tpl.Execute(goMap)
+				default:
+					return nil, errors.New("unknown template engine")
+				}
 			},
 		}),
 	}))
 
+}
+
+func wrenMapToGoMap(m *wren.MapHandle, k *wren.ListHandle) (map[string]interface{}, error) {
+	var keys []string
+	c, err := k.Count()
+	if err != nil {
+		return nil, err
+	}
+	for i := 0; i < c; i++ {
+		key, err := k.Get(i)
+		if err != nil {
+			return nil, err
+		}
+		keys = append(keys, key.(string))
+	}
+	goMap := make(map[string]interface{})
+	for _, key := range keys {
+		value, err := m.Get(key)
+		if err != nil {
+			return nil, err
+		}
+		goMap[key] = value
+	}
+	return goMap, nil
 }
