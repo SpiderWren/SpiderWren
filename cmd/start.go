@@ -8,17 +8,17 @@ import (
 	"syscall"
 
 	wren "github.com/crazyinfin8/WrenGo"
-	"github.com/spiderwren/spiderwren/utils"
-	"github.com/spiderwren/spiderwren/web"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spiderwren/spiderwren/utils"
+	"github.com/spiderwren/spiderwren/web"
 )
 
 // startCmd represents the start command
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Starts a server to run your app",
-	Long: `Starts a development server to run your app.`,
+	Long:  `Starts a development server to run your app.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		debugMode, err := cmd.Flags().GetBool("debug")
 		if err != nil {
@@ -38,7 +38,7 @@ var startCmd = &cobra.Command{
 		vm := cfg.NewVM()
 		defer vm.Free()
 		app := web.App{
-			Router: gin.Default(),
+			Router:    gin.Default(),
 			IsServing: false,
 		}
 		log.Debug("Creating foreign classes")
